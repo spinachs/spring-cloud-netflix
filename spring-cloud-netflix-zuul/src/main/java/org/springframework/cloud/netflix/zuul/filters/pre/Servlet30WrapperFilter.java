@@ -34,6 +34,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 /**
  * Pre {@link ZuulFilter} that wraps requests in a Servlet 3.0 compliant wrapper. Zuul's
  * default wrapper is only Servlet 2.5 compliant.
+ * Zuul默认wrapper是Servlet2.5，该filter将请求转wrap成Servlet3.0.
  *
  * @author Spencer Gibb
  */

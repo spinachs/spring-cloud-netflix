@@ -31,6 +31,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 /**
  * Pre {@link ZuulFilter} that sets {@link RequestContext} debug attributes to true if the
  * "debug" request parameter is set.
+ * 如果设置了debug请求参数，将debug属性设置为true。
  *
  * @author Spencer Gibb
  */
@@ -55,9 +56,11 @@ public class DebugFilter extends ZuulFilter {
 	@Override
 	public boolean shouldFilter() {
 		HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+		//配置中zuul.debug.parameter设置的value在request存在，且值为true
 		if ("true".equals(request.getParameter(DEBUG_PARAMETER.get()))) {
 			return true;
 		}
+		//配置文件中zuul.debug.request设置为true
 		return ROUTING_DEBUG.get();
 	}
 

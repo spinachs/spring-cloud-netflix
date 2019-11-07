@@ -183,6 +183,7 @@ public class ZuulProperties {
 
 	/**
 	 * Setting for SendResponseFilter for the initial stream buffer size.
+	 * 初始化流缓存大小，默认：8k
 	 */
 	private int initialStreamBufferSize = 8192;
 
@@ -202,6 +203,11 @@ public class ZuulProperties {
 		this.ignoredHeaders.addAll(ignoredHeaders);
 	}
 
+	/**
+	 * 1.设置serviceId，如果url和serviceId都不存在，将proxy设置为serviceId.
+	 * 2.设置id，如果id不存在，将proxy设置为id.
+	 * 3.设置path，如果path不存在，按照/{proxy}/**格式设置.
+	 */
 	@PostConstruct
 	public void init() {
 		for (Entry<String, ZuulRoute> entry : this.routes.entrySet()) {
@@ -218,11 +224,18 @@ public class ZuulProperties {
 		}
 	}
 
+	/**
+	 * 获取Zuul Filter前缀正则.
+	 *
+	 * @return
+	 */
 	public String getServletPattern() {
 		String path = this.servletPath;
+		//设置以/开头
 		if (!path.startsWith("/")) {
 			path = "/" + path;
 		}
+		//path中不包含*时，设置为以/*结尾
 		if (!path.contains("*")) {
 			path = path.endsWith("/") ? (path + "*") : (path + "/*");
 		}
@@ -507,11 +520,13 @@ public class ZuulProperties {
 
 		/**
 		 * The ID of the route (the same as its map key by default).
+		 * 路由id.
 		 */
 		private String id;
 
 		/**
 		 * The path (pattern) for the route, e.g. /foo/**.
+		 * 路由path正则.
 		 */
 		private String path;
 
@@ -727,37 +742,44 @@ public class ZuulProperties {
 
 		/**
 		 * The maximum number of total connections the proxy can hold open to backends.
+		 * 代理网关与后端服务保持打开的最大连接数.
 		 */
 		private int maxTotalConnections = 200;
 
 		/**
 		 * The maximum number of connections that can be used by a single route.
+		 * 单个路由可用的最大连接数.
 		 */
 		private int maxPerRouteConnections = 20;
 
 		/**
 		 * The socket timeout in millis. Defaults to 10000.
+		 * socket超时时间，单位：毫秒，默认：10000
 		 */
 		private int socketTimeoutMillis = 10000;
 
 		/**
 		 * The connection timeout in millis. Defaults to 2000.
+		 * 连接超时时间，单位：毫秒，默认：2000
 		 */
 		private int connectTimeoutMillis = 2000;
 
 		/**
 		 * The timeout in milliseconds used when requesting a connection from the
 		 * connection manager. Defaults to -1, undefined use the system default.
+		 * 连接管理器中请求连接所用超时时间，单位：毫秒，默认：-1，使用系统默认
 		 */
 		private int connectionRequestTimeoutMillis = -1;
 
 		/**
 		 * The lifetime for the connection pool.
+		 * 连接池生命时长，默认：-1，表示无限
 		 */
 		private long timeToLive = -1;
 
 		/**
 		 * The time unit for timeToLive.
+		 * 生命时长时间单位，默认：毫秒
 		 */
 		private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
@@ -878,6 +900,7 @@ public class ZuulProperties {
 
 		/**
 		 * The maximum number of total semaphores for Hystrix.
+		 * 熔断器总信号量最大个数.
 		 */
 		private int maxSemaphores = 100;
 

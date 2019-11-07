@@ -71,7 +71,7 @@ public class SendResponseFilter extends ZuulFilter {
 	public SendResponseFilter(ZuulProperties zuulProperties) {
 		this.zuulProperties = zuulProperties;
 		// To support Servlet API 3.1 we need to check if setContentLengthLong exists
-		// minimum support in Spring 5 is 3.0 so we need to keep tihs
+		// minimum support in Spring 5 is 3.0 so we need to keep this
 		try {
 			HttpServletResponse.class.getMethod("setContentLengthLong", long.class);
 		}
@@ -96,6 +96,11 @@ public class SendResponseFilter extends ZuulFilter {
 		return SEND_RESPONSE_FILTER_ORDER;
 	}
 
+	/**
+	 * 出现异常执行了ErrorFilter的话不执行
+	 * Zuul Response Header， ResponseDataStream和ResponseBody都为空，不执行
+	 * @return
+	 */
 	@Override
 	public boolean shouldFilter() {
 		RequestContext context = RequestContext.getCurrentContext();
@@ -120,6 +125,7 @@ public class SendResponseFilter extends ZuulFilter {
 	private void writeResponse() throws Exception {
 		RequestContext context = RequestContext.getCurrentContext();
 		// there is no body to send
+		//没有消息要响应
 		if (context.getResponseBody() == null
 				&& context.getResponseDataStream() == null) {
 			return;
@@ -275,6 +281,7 @@ public class SendResponseFilter extends ZuulFilter {
 				servletResponse.addHeader(X_ZUUL_DEBUG_HEADER, debugHeader.toString());
 			}
 		}
+		//设置Zuul Response Header信息，Content-Encoding除外
 		List<Pair<String, String>> zuulResponseHeaders = context.getZuulResponseHeaders();
 		if (zuulResponseHeaders != null) {
 			for (Pair<String, String> it : zuulResponseHeaders) {
@@ -302,6 +309,14 @@ public class SendResponseFilter extends ZuulFilter {
 		return value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE;
 	}
 
+	/**
+	 * 判断是否在头部包含Content Length信息。
+	 * 1、配置文件中设置了false，不包含
+	 * 2、Content-Length未包含，不包含
+	 * 3、response设置gzip，请求未设置gzip，不包含
+	 * @param context
+	 * @return
+	 */
 	protected boolean includeContentLengthHeader(RequestContext context) {
 		// Not configured to forward the header
 		if (!this.zuulProperties.isSetContentLength()) {

@@ -60,6 +60,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 /**
  * Pre {@link ZuulFilter} that determines where and how to route based on the supplied
  * {@link RouteLocator}. Also sets various proxy related headers for downstream requests.
+ * 决定在哪如何给予支持的{@link RouteLocator}路由抓转发，并且为下游请求设置各种代理头部
  *
  * @author Spencer Gibb
  * @author Dave Syer
@@ -115,6 +116,10 @@ public class PreDecorationFilter extends ZuulFilter {
 		return PRE_TYPE;
 	}
 
+	/**
+	 * 未设置forward.to，并且没有serviceId.
+	 * @return
+	 */
 	@Override
 	public boolean shouldFilter() {
 		RequestContext ctx = RequestContext.getCurrentContext();

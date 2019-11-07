@@ -35,6 +35,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * Zuul filter processing and rely on this information in all filters. RequestContext is
  * used such that the information is accessible to classes which do not have a request
  * reference.
+ * 检测请求执行通过{@link DispatcherServlet}还是{@link ZuulServlet}，目的是在所有Zuul过滤器处理最开始检测到实现方式，
+ * 作为后续所有filter依赖，使用RequestContext来访问类信息.
  *
  * @author Adrian Ivan
  */
@@ -51,6 +53,7 @@ public class ServletDetectionFilter extends ZuulFilter {
 	/**
 	 * Must run before other filters that rely on the difference between DispatcherServlet
 	 * and ZuulServlet.
+	 * 必须在其他依赖于DispatcherServlet和ZuulSevlet差异的过滤器之前执行。
 	 */
 	@Override
 	public int filterOrder() {
@@ -62,6 +65,10 @@ public class ServletDetectionFilter extends ZuulFilter {
 		return true;
 	}
 
+	/**
+	 * Servlet类型实现判断：request不是HttpServletRequestWrapper实例，并且request属性DispatcherServlet.CONTEXT不为空。
+	 * @return
+	 */
 	@Override
 	public Object run() {
 		RequestContext ctx = RequestContext.getCurrentContext();

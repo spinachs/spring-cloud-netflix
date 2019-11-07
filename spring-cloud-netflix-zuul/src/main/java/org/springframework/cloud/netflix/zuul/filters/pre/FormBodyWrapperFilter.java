@@ -48,6 +48,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 /**
  * Pre {@link ZuulFilter} that parses form data and reencodes it for downstream services.
+ * Pre类型{@link ZuulFilter}，为下游服务解析并重编码form表单数据
  *
  * @author Dave Syer
  */
@@ -98,6 +99,7 @@ public class FormBodyWrapperFilter extends ZuulFilter {
 		}
 		// Only use this filter for form data and only for multipart data in a
 		// DispatcherServlet handler
+		//只在两种情况下执行该filter：1. form表单数据；2.DispatcherServlet中的multipart数据
 		try {
 			MediaType mediaType = MediaType.valueOf(contentType);
 			return MediaType.APPLICATION_FORM_URLENCODED.includes(mediaType)
@@ -119,6 +121,7 @@ public class FormBodyWrapperFilter extends ZuulFilter {
 		RequestContext ctx = RequestContext.getCurrentContext();
 		HttpServletRequest request = ctx.getRequest();
 		FormBodyRequestWrapper wrapper = null;
+		//已经包装的HttpServletRequestWrapper有原请求字段req，将req包装成FormBodyRequestWrapper类型，再设置回去。
 		if (request instanceof HttpServletRequestWrapper) {
 			HttpServletRequest wrapped = (HttpServletRequest) ReflectionUtils
 					.getField(this.requestField, request);
@@ -127,8 +130,8 @@ public class FormBodyWrapperFilter extends ZuulFilter {
 			if (request instanceof ServletRequestWrapper) {
 				ReflectionUtils.setField(this.servletRequestField, request, wrapper);
 			}
-		}
-		else {
+		} else {
+			//将request包装成FormBodyRequestWrapper设置回去.
 			wrapper = new FormBodyRequestWrapper(request);
 			ctx.setRequest(wrapper);
 		}

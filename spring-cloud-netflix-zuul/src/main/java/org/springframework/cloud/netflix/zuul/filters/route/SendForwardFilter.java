@@ -49,6 +49,10 @@ public class SendForwardFilter extends ZuulFilter {
 		return SEND_FORWARD_FILTER_ORDER;
 	}
 
+	/**
+	 * 转发请求：设置了forward.to，并且sendForwardFilter.ran为false
+	 * @return
+	 */
 	@Override
 	public boolean shouldFilter() {
 		RequestContext ctx = RequestContext.getCurrentContext();

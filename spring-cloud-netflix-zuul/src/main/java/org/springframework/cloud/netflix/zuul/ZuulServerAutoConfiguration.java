@@ -151,6 +151,11 @@ public class ZuulServerAutoConfiguration {
 		return new ZuulRefreshListener();
 	}
 
+	/**
+	 * Zuul实现方式一，使用HttpServlet实现
+	 * 执行条件：zuul.use-filter设置为false或者未配置
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(name = "zuulServlet")
 	@ConditionalOnProperty(name = "zuul.use-filter", havingValue = "false",
@@ -164,6 +169,11 @@ public class ZuulServerAutoConfiguration {
 		return servlet;
 	}
 
+	/**
+	 * Zuul实现方式二，使用Servlet Filter方式实现
+	 * 执行条件：zuul.use-filter设置为true
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(name = "zuulServletFilter")
 	@ConditionalOnProperty(name = "zuul.use-filter", havingValue = "true",
