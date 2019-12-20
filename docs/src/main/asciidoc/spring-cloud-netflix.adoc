@@ -335,6 +335,18 @@ When a refresh occurs clients will be unregistered from the Eureka server and th
 where all instance of a given service are not available. One way to eliminate this from happening is to disable
 the ability to refresh Eureka clients.  To do this set `eureka.client.refresh.enable=false`.
 
+=== Using Eureka with Spring Cloud LoadBalancer
+
+We offer support for the Spring Cloud LoadBalancer `ZonePreferenceServiceInstanceListSupplier`.
+The `zone` value from the Eureka instance metadata (`eureka.instance.metadataMap.zone`) is used for setting the
+value of `spring-clod-loadbalancer-zone` property that is used to filter service instances by zone.
+
+If that is missing and if the `spring.cloud.loadbalancer.eureka.approximateZoneFromHostname` flag is set to `true`,
+it can use the domain name from the server hostname as a proxy for the zone.
+
+If there is no other source of zone data, then a guess is made, based on the client configuration (as opposed to the instance configuration).
+We take `eureka.client.availabilityZones`, which is a map from region name to a list of zones, and pull out the first zone for the instance's own region (that is, the `eureka.client.region`, which defaults to "us-east-1", for compatibility with native Netflix).
+
 [[spring-cloud-eureka-server]]
 == Service Discovery: Eureka Server
 
@@ -902,7 +914,7 @@ public class TestConfiguration {
 In this case, the client is composed from the components already in `RibbonClientConfiguration`, together with any in `CustomConfiguration` (where the latter generally overrides the former).
 // TODO "generally"? We should link to the rules that dictate this behavior.
 
-WARNING: The `CustomConfiguration` clas must be a `@Configuration` class, but take care that it is not in a `@ComponentScan` for the main application context.
+WARNING: The `CustomConfiguration` class must be a `@Configuration` class, but take care that it is not in a `@ComponentScan` for the main application context.
 Otherwise, it is shared by all the `@RibbonClients`. If you use `@ComponentScan` (or `@SpringBootApplication`), you need to take steps to avoid it being included (for instance, you can put it in a separate, non-overlapping package or specify the packages to scan explicitly in the `@ComponentScan`).
 
 The following table shows the beans that Spring Cloud Netflix provides by default for Ribbon:
